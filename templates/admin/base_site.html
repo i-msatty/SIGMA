@@ -1,0 +1,16 @@
+{%extends 'admin/base.html'%}
+{% load static %}
+{%block branding%}
+<h1 id="head">
+    <img src="{% static 'img/logo.jpg'%}" alt="Brand-image" class="brand_img" height="80" width="80"><span
+        style="justify-content: center;margin-left:2cm;font-family:Caveat; color:white">SIGMA
+        Administration
+        Area</span>
+</h1>
+{%endblock%}
+
+{%block extrastyle%}
+
+<link rel="stylesheet" href="{% static 'css/admin.css' %}">
+
+{%endblock%}

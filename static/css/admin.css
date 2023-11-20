@@ -1,0 +1,12 @@
+#header {
+height: 50px;
+background-color: black;
+color:crimson;
+font-family: Caveat;
+font-size: large;
+}
+
+.content {
+    background-color: black;
+    font-family: Caveat;
+}
