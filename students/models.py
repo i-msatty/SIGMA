@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class students(models.Model):
-    students_id = models.ForeignKey(User,primary_key=True,on_delete=models.CASCADE)
+    students_id = models.ForeignKey(User, primary_key=True, on_delete=models.CASCADE)
     firstName = models.CharField(max_length=100)
     lastName = models.CharField(max_length=100)
     username = models.CharField(max_length=200)
@@ -27,12 +27,12 @@ class students(models.Model):
 
 
 class enrolledcourses(models.Model):
-    student_id = models.ForeignKey(students, on_delete=models.DO_NOTHING)
-    course_id = models.ForeignKey(courses, on_delete=models.DO_NOTHING)
+    student_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    course_id = models.ForeignKey(courses, on_delete=models.CASCADE)
     enrolled_date = models.DateTimeField(default=datetime.now, blank=True)
 
     def courseid(self):
         return self.course_id
 
     def __str__(self):
-        return self.student_id.firstName+" "+self.student_id.lastName+" is linked to "+ self.course_id.name
+        return self.student_id.first_name + " " +self.student_id.last_name + " is linked to " + self.course_id.name

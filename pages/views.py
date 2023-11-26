@@ -19,7 +19,6 @@ def dashboard1(request):
         "ALLcourses": ALLcourses,
         "ALLenrolled": ALLenrolled,
     }
-    print(ALLenrolled)
     return render(request, "pages/dashboard1.html", context)
 
 
@@ -73,6 +72,17 @@ def studentregister(request):
                         password=password1,
                     )
                     user.save()
+                    getuserid = User.objects.all().filter(username=username)
+                    for name in getuserid:
+                        registerstudentinstudents = students(
+                            students_id=name,
+                            firstName=first_name,
+                            lastName=last_name,
+                            username=username,
+                            phoneNo=987654321,
+                            email=email,
+                        )
+                        registerstudentinstudents.save()
                     messages.success(
                         request,
                         "You are successfully registered with us And ready to log in",
@@ -116,9 +126,20 @@ def counsellorregister(request):
                         password=password1,
                     )
                     user.save()
+                    getuserid = User.objects.all().filter(username=username)
+                    for name in getuserid:
+                        registercounsellorincounsellors = counsellors(
+                            counsellor_id=name,
+                            firstName=firstname,
+                            lastName=lastname,
+                            username=username,
+                            phoneNo=987654321,
+                            email=email,
+                        )
+                        registercounsellorincounsellors.save()
                     messages.success(
                         request,
-                        "You are successfully registered with us And ready to log in",
+                        "You are successfully registered with us and ready to log in",
                     )
                     return redirect("counsellorlogin")
         else:
@@ -134,13 +155,17 @@ def studentlogin(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
-        user = auth.authenticate(username=username, password=password)
-        if user is not None:
-            auth.login(request, user)
-            messages.success(request, "You are now logged in")
-            return redirect("dashboard1")
+        if students.objects.filter(username=username).exists():
+            user = auth.authenticate(username=username, password=password)
+            if user is not None:
+                auth.login(request, user)
+                messages.success(request, "You are now logged in")
+                return redirect("dashboard1")
+            else:
+                messages.error(request, "Wrong Credentials")
+                return redirect("studentlogin")
         else:
-            messages.error(request, "Wrong Credentials")
+            messages.error(request, "You are not authorized")
             return redirect("studentlogin")
     return render(request, "pages/studentlogin.html")
 
@@ -151,15 +176,19 @@ def counsellorlogin(request):
         username = request.POST["username"]
         password = request.POST["password"]
         checkbox = request.POST["checkbox"]
-        user = auth.authenticate(username=username, password=password)
-        if checkbox == "checkboxvalue":
-            if user is not None:
-                auth.login(request, user)
-                messages.success(request, "You are now logged in")
-                return redirect("dashboard2")
-            else:
-                messages.error(request, "Wrong Credentials")
-                return redirect("counsellorlogin")
+        if counsellors.objects.filter(username=username).exists():
+            user = auth.authenticate(username=username, password=password)
+            if checkbox == "checkboxvalue":
+                if user is not None:
+                    auth.login(request, user)
+                    messages.success(request, "You are now logged in")
+                    return redirect("dashboard2")
+                else:
+                    messages.error(request, "Wrong Credentials")
+                    return redirect("counsellorlogin")
+        else:
+            messages.error(request, "You are not authorized")
+            return redirect("counsellorlogin")
     return render(request, "pages/counsellorlogin.html")
 
 
@@ -168,7 +197,6 @@ def logout(request):
         auth.logout(request)
         messages.success(request, "You are now successfully logged out")
         return redirect("index")
-    
 
 
 def enrolledcourse(request, course_id):
@@ -184,17 +212,31 @@ def viewCourse(request, course_id):
 
 
 def browseCourses(request):
-    course=courses.objects.all()
-    context={
-        "allcourses":course
-    }
-    return render(request, "pages/browseCourses.html",context)
+    course = courses.objects.all()
+    context = {"allcourses": course}
+    return render(request, "pages/browseCourses.html", context)
 
 
 def browseCounsellor(request):
-    teachers=counsellors.objects.all()
-    context={
-        "allcounsellorkey":teachers,
+    teachers = counsellors.objects.all()
+    context = {
+        "allcounsellorkey": teachers,
     }
-    return render(request, "pages/browseCounsellor.html",context)
+    return render(request, "pages/browseCounsellor.html", context)
 
+
+def doenroll(request, coursekey):
+    if request.method == "POST":
+        student_id = request.user.id
+        already_enrolled = enrolledcourses.objects.all().filter(
+            student_id=student_id, course_id=coursekey
+        )
+        if already_enrolled:
+            messages.error(request, "you  are already enrolled in this course")
+        else:
+            objects = courses.objects.all().filter(courses_id=coursekey)
+            for object in objects:
+                enrolling = enrolledcourses(student_id=request.user, course_id=object)
+                enrolling.save()
+            messages.success(request, "You have successfully enrolled now")
+        return redirect("dashboard1")

@@ -8,7 +8,7 @@ class courses(models.Model):
     name = models.CharField(max_length=200)
     description=models.CharField(max_length=300,blank=True)
     duration = models.CharField(max_length=20)
-    image=models.ImageField(upload_to='Coursesphotos/%Y/%m/%d/', blank=True)
+    image=models.ImageField(upload_to='Coursesphotos/%Y/%m/%d/', blank=False)
 
     def __str__(self):
         return self.name
@@ -22,6 +22,6 @@ class CourseUnits(models.Model):
     unit3=models.FileField(upload_to='pdf')
     unit4=models.FileField(upload_to='pdf')
     unit5=models.FileField(upload_to='pdf')
-
+    
     def __str__(self):
         return self.course_id.name
